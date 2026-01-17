@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const publicRoutes = ['/login', '/register', '/verify-email', '/forgot-password', '/reset-password']
+const publicRoutes = ['/', '/login', '/register', '/verify-email', '/forgot-password', '/reset-password']
 const authRoutes = ['/login', '/register']
 
 export function middleware(request: NextRequest) {
@@ -10,8 +10,8 @@ export function middleware(request: NextRequest) {
   // Get token from cookie (if you store it there) or check auth
   const hasAuthCookie = request.cookies.has('auth-storage')
   
-  // Check if the route is public
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+  // Allow public routes
+  const isPublicRoute = publicRoutes.some(route => pathname === route)
   const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
 
   // Redirect authenticated users away from auth pages
@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/projects', request.url))
   }
 
-  // Redirect unauthenticated users to login
+  // Redirect unauthenticated users to login (except public routes)
   if (!hasAuthCookie && !isPublicRoute && pathname.startsWith('/projects')) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
