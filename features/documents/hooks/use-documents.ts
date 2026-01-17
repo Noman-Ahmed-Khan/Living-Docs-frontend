@@ -10,9 +10,12 @@ export function useDocuments(
     queryKey: ['documents', projectId, params],
     queryFn: () => documentsApi.list(projectId, params),
     enabled: !!projectId,
-    refetchInterval: (data) => {
+    refetchInterval: (query) => {
       // Refetch every 3 seconds if there are processing documents
-      const hasProcessing = data?.items.some(
+      const data = query.state.data
+      if (!data) return false
+      
+      const hasProcessing = data.items.some(
         (doc) =>
           doc.status === DocumentStatus.PROCESSING ||
           doc.status === DocumentStatus.PENDING

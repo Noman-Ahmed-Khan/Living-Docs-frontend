@@ -2,8 +2,6 @@
 
 import { Citation } from '@/lib/api/query'
 import { X, FileText } from 'lucide-react'
-// Remove: import { Document, Page } from 'react-pdf'
-// Add one of the alternatives above
 
 interface CitationPanelProps {
   citation: Citation
@@ -67,14 +65,6 @@ export function CitationPanel({ citation, onClose }: CitationPanelProps) {
               <p className="text-sm whitespace-pre-wrap">{citation.text_snippet}</p>
             </div>
           </div>
-        )}
-
-        {/* View Full Document Button (optional) */}
-        {citation.document_id && (
-          <button className="btn btn-primary btn-sm w-full gap-2">
-            <FileText className="h-4 w-4" />
-            View Full Document
-          </button>
         )}
 
         {/* Chunk ID */}

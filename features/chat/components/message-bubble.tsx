@@ -23,7 +23,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
   const processContent = (content: string) => {
     // Replace citation markers [chunk_id] with clickable links
     return content.replace(/\[([^\]]+)\]/g, (match, citationId) => {
-      return `<button class="citation-link" data-citation="${citationId}">${match}</button>`
+      return `<button class="citation-link text-primary hover:underline" data-citation="${citationId}">${match}</button>`
     })
   }
 
@@ -60,7 +60,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
             <p className="whitespace-pre-wrap">{message.content}</p>
           ) : (
             <div
-              className="prose prose-sm max-w-none"
+              className="prose prose-sm max-w-none dark:prose-invert"
               onClick={(e) => {
                 const target = e.target as HTMLElement
                 if (target.classList.contains('citation-link')) {
@@ -79,7 +79,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
             {message.citations.map((citation, index) => (
               <button
                 key={citation.chunk_id}
-                className="badge badge-sm badge-outline gap-1 hover:badge-primary"
+                className="badge badge-sm badge-outline gap-1 hover:badge-primary transition-colors"
                 onClick={() => onCitationClick?.(citation)}
               >
                 <span className="font-mono text-xs">{index + 1}</span>

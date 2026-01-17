@@ -3,7 +3,7 @@
 import { ChangePasswordForm } from '@/features/auth/components/change-password-form'
 import { SessionList } from '@/features/auth/components/session-list'
 import { UserProfileSection } from '@/features/auth/components/user-profile-section'
-import { Shield, Key, Devices } from 'lucide-react'
+import { Shield, Key, MonitorSmartphone } from 'lucide-react' // Changed Devices to MonitorSmartphone
 
 export default function SettingsPage() {
   return (
@@ -41,7 +41,7 @@ export default function SettingsPage() {
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <div className="flex items-center gap-3 mb-4">
-            <Devices className="h-6 w-6 text-primary" />
+            <MonitorSmartphone className="h-6 w-6 text-primary" />
             <h2 className="card-title">Active Sessions</h2>
           </div>
           <SessionList />

@@ -35,5 +35,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-base-400;
+  @apply bg-neutral;
+}
+
+/* Citation link styles for chat */
+.citation-link {
+  @apply text-primary hover:underline cursor-pointer inline;
 }
