@@ -24,6 +24,10 @@ export const useAuthStore = create<AuthState>()(
 
       setTokens: (accessToken, refreshToken) => {
         set({ accessToken, refreshToken })
+        // Set cookie for middleware
+        if (typeof window !== 'undefined') {
+          document.cookie = `auth-storage=true; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+        }
       },
 
       setUser: (user) => {
@@ -32,6 +36,10 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         set({ accessToken: null, refreshToken: null, user: null })
+        // Remove cookie
+        if (typeof window !== 'undefined') {
+          document.cookie = 'auth-storage=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+        }
       },
 
       isAuthenticated: () => {
