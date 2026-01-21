@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  FolderKanban, 
-  Settings, 
+import {
+  FolderKanban,
+  Settings,
   LogOut,
   FileText,
 } from 'lucide-react'
@@ -24,7 +24,7 @@ export function Sidebar() {
 
   const handleLogout = () => {
     logout()
-    router.push('/login')
+    router.replace('/login')
   }
 
   return (

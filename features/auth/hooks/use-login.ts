@@ -14,7 +14,7 @@ export function useLogin() {
     },
     onSuccess: async (data) => {
       setTokens(data.access_token, data.refresh_token)
-      
+
       // Fetch user profile
       try {
         const status = await authApi.getAuthStatus()
@@ -23,9 +23,14 @@ export function useLogin() {
           email: status.email,
           is_verified: status.is_verified,
         })
-        
+
         toast.success('Welcome back!')
-        router.push('/projects')
+
+        // Use replace instead of push to prevent back button issues
+        // Small delay to ensure state is fully updated
+        setTimeout(() => {
+          router.replace('/projects')
+        }, 100)
       } catch (error) {
         toast.error('Failed to load user profile')
       }

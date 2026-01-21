@@ -2,19 +2,15 @@
 
 import { useAuthStore } from '@/store/use-auth-store'
 import { authApi } from '@/lib/api/auth'
-import { useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(true)
   const { setUser, logout, isAuthenticated } = useAuthStore()
-  const router = useRouter()
-  const pathname = usePathname()
 
   useEffect(() => {
-    async function checkAuth() {
+    async function validateAuth() {
+      // Only validate if we think we're authenticated
       if (!isAuthenticated()) {
-        setIsLoading(false)
         return
       }
 
@@ -26,26 +22,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           is_verified: status.is_verified,
         })
       } catch (error) {
-        console.error('Auth check failed:', error)
+        console.error('Auth validation failed:', error)
+        // Token is invalid or expired, clear auth state
         logout()
-        if (pathname?.startsWith('/projects')) {
-          router.push('/login')
-        }
-      } finally {
-        setIsLoading(false)
       }
     }
 
-    checkAuth()
+    validateAuth()
   }, [])
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    )
-  }
 
   return <>{children}</>
 }

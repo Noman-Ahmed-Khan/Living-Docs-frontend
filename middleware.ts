@@ -6,13 +6,13 @@ const authRoutes = ['/login', '/register']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
-  // Get token from cookie (if you store it there) or check auth
+
+  // Get token from cookie
   const hasAuthCookie = request.cookies.has('auth-storage')
-  
-  // Allow public routes
-  const isPublicRoute = publicRoutes.some(route => pathname === route)
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route))
+
+  // Check if the current route is public
+  const isPublicRoute = publicRoutes.includes(pathname)
+  const isAuthRoute = authRoutes.includes(pathname)
 
   // Redirect authenticated users away from auth pages
   if (hasAuthCookie && isAuthRoute) {

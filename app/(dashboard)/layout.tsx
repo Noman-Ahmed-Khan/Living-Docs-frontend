@@ -4,7 +4,7 @@ import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { useAuthStore } from '@/store/use-auth-store'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function DashboardLayout({
   children,
@@ -13,13 +13,30 @@ export default function DashboardLayout({
 }) {
   const { isAuthenticated } = useAuthStore()
   const router = useRouter()
+  const [isHydrated, setIsHydrated] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated()) {
+    // Mark as hydrated after initial mount
+    setIsHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    // Only check auth after hydration is complete
+    if (isHydrated && !isAuthenticated()) {
       router.push('/login')
     }
-  }, [isAuthenticated, router])
+  }, [isHydrated, isAuthenticated, router])
 
+  // Show loading state during hydration
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    )
+  }
+
+  // Don't render dashboard if not authenticated
   if (!isAuthenticated()) {
     return null
   }
