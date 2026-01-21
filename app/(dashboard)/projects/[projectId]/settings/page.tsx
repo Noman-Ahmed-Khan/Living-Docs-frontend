@@ -5,8 +5,9 @@ import { useProject, useUpdateProject } from '@/features/projects/hooks/use-proj
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { updateProjectSchema, UpdateProjectFormData } from '@/lib/validators/project-schemas'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Settings, AlertTriangle, RefreshCcw, Layout, Database } from 'lucide-react'
 import { useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 export default function ProjectSettingsPage() {
   const params = useParams()
@@ -44,151 +45,173 @@ export default function ProjectSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-xs font-bold uppercase tracking-widest text-base-content/40">Loading Configuration...</p>
       </div>
     )
   }
 
   if (!project) {
     return (
-      <div className="alert alert-error">
-        <span>Project not found</span>
+      <div className="glass-card p-12 text-center max-w-lg mx-auto mt-20">
+        <h2 className="text-xl font-bold">Project Not Found</h2>
+        <p className="text-base-content/60 mt-2">The project you are looking for does not exist.</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Project Settings</h1>
-        <p className="text-base-content/70 mt-1">
-          Manage your project configuration
-        </p>
+    <div className="max-w-4xl space-y-8 animate-fade-in mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary mb-1">
+            <Settings className="h-3 w-3" />
+            Project Configuration
+          </div>
+          <h1 className="text-4xl font-display font-bold gradient-text">Settings</h1>
+          <p className="text-base-content/60 font-light max-w-xl">
+            Fine-tune the intelligence and behavior of your project workspace.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title">General Information</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        {/* General Information */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <Layout className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-bold uppercase tracking-widest text-base-content/40">General Knowledge</h3>
+          </div>
+          <div className="glass-card p-8 rounded-2xl shadow-sm space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-base-content/70">Project Name</label>
+                <input
+                  type="text"
+                  className={cn(
+                    "input input-bordered w-full bg-base-100/50 focus:border-primary focus:ring-2 focus:ring-primary/20",
+                    errors.name && "input-error"
+                  )}
+                  {...register('name')}
+                />
+                {errors.name && (
+                  <p className="text-[10px] text-error font-bold uppercase mt-1">{errors.name.message}</p>
+                )}
+              </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Project Name</span>
-              </label>
-              <input
-                type="text"
-                className={`input input-bordered ${errors.name ? 'input-error' : ''}`}
-                {...register('name')}
-              />
-              {errors.name && (
-                <label className="label">
-                  <span className="label-text-alt text-error">{errors.name.message}</span>
-                </label>
-              )}
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Description</span>
-              </label>
-              <textarea
-                className={`textarea textarea-bordered h-24 ${errors.description ? 'textarea-error' : ''}`}
-                {...register('description')}
-              />
-              {errors.description && (
-                <label className="label">
-                  <span className="label-text-alt text-error">
-                    {errors.description.message}
-                  </span>
-                </label>
-              )}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-base-content/70">Workspace Description</label>
+                <textarea
+                  className={cn(
+                    "textarea textarea-bordered w-full h-32 bg-base-100/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all",
+                    errors.description && "textarea-error"
+                  )}
+                  placeholder="Describe the purpose of this project..."
+                  {...register('description')}
+                />
+                {errors.description && (
+                  <p className="text-[10px] text-error font-bold uppercase mt-1">{errors.description.message}</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow-xl">
-          <div className="card-body">
-            <h2 className="card-title">Chunking Configuration</h2>
-            <div className="alert alert-warning">
-              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <span className="text-sm">
-                Changing these settings will not affect existing documents. You'll need to
-                re-process documents for changes to take effect.
-              </span>
+        {/* Technical Config */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <Database className="h-4 w-4 text-secondary" />
+            <h3 className="text-sm font-bold uppercase tracking-widest text-base-content/40">Intelligence Engine</h3>
+          </div>
+          <div className="glass-card p-8 rounded-2xl shadow-sm space-y-6">
+            <div className="flex items-center gap-4 p-5 rounded-2xl bg-warning/5 border border-warning/10">
+              <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-warning" />
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="text-sm font-bold">Heads Up</h4>
+                <p className="text-xs text-base-content/60 leading-relaxed font-medium">
+                  Changing chunking parameters will only affect newly uploaded documents. To apply changes to existing files, you'll need to re-process them individually.
+                </p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Chunk Size</span>
-                </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-sm font-semibold text-base-content/70">
+                  <label>Chunk Size</label>
+                  <span className="text-[10px] uppercase font-bold text-primary px-2 py-0.5 rounded-md bg-primary/10">100 - 4000 chars</span>
+                </div>
                 <input
                   type="number"
-                  className={`input input-bordered ${errors.chunk_size ? 'input-error' : ''}`}
+                  className={cn(
+                    "input input-bordered w-full bg-base-100/50 focus:border-primary focus:ring-2 focus:ring-primary/20",
+                    errors.chunk_size && "input-error"
+                  )}
                   {...register('chunk_size', { valueAsNumber: true })}
                 />
-                <label className="label">
-                  <span className="label-text-alt">100 - 4000 characters</span>
-                </label>
+                <p className="text-[10px] text-base-content/40 font-medium leading-normal">
+                  The number of characters per document piece. Large chunks provide more context but might use more tokens.
+                </p>
                 {errors.chunk_size && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.chunk_size.message}
-                    </span>
-                  </label>
+                  <p className="text-[10px] text-error font-bold uppercase mt-1">{errors.chunk_size.message}</p>
                 )}
               </div>
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Chunk Overlap</span>
-                </label>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center text-sm font-semibold text-base-content/70">
+                  <label>Chunk Overlap</label>
+                  <span className="text-[10px] uppercase font-bold text-secondary px-2 py-0.5 rounded-md bg-secondary/10">0 - 1000 chars</span>
+                </div>
                 <input
                   type="number"
-                  className={`input input-bordered ${errors.chunk_overlap ? 'input-error' : ''}`}
+                  className={cn(
+                    "input input-bordered w-full bg-base-100/50 focus:border-primary focus:ring-2 focus:ring-primary/20",
+                    errors.chunk_overlap && "input-error"
+                  )}
                   {...register('chunk_overlap', { valueAsNumber: true })}
                 />
-                <label className="label">
-                  <span className="label-text-alt">0 - 1000 characters</span>
-                </label>
+                <p className="text-[10px] text-base-content/40 font-medium leading-normal">
+                  The number of characters that overlap between adjacent chunks. This helps maintain semantic continuity.
+                </p>
                 {errors.chunk_overlap && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.chunk_overlap.message}
-                    </span>
-                  </label>
+                  <p className="text-[10px] text-error font-bold uppercase mt-1">{errors.chunk_overlap.message}</p>
                 )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => reset()}
-            disabled={!isDirty || updateMutation.isPending}
-          >
-            Reset
-          </button>
+        {/* Footer Actions */}
+        <div className="flex items-center justify-between p-6 glass-card rounded-2xl bg-base-100/30">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className={cn(
+                "btn btn-ghost hover:bg-base-200/50 flex items-center gap-2",
+                !isDirty && "opacity-0 pointer-events-none"
+              )}
+              onClick={() => reset()}
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Discard Changes
+            </button>
+          </div>
           <button
             type="submit"
-            className="btn btn-primary gap-2"
+            className="btn btn-gradient gap-2 rounded-xl shadow-glow hover:shadow-glow-lg transition-all px-8"
             disabled={!isDirty || updateMutation.isPending}
           >
             {updateMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Saving...
+                Processing...
               </>
             ) : (
               <>
                 <Save className="h-4 w-4" />
-                Save Changes
+                Commit Configuration
               </>
             )}
           </button>

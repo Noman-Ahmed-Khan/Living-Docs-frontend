@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { authApi } from '@/lib/api/auth'
-import { toast } from 'sonner'
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, Mail } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function VerifyEmailPage() {
   const searchParams = useSearchParams()
@@ -14,7 +14,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     const token = searchParams.get('token')
-    
+
     if (!token) {
       setStatus('error')
       setMessage('Invalid verification link')
@@ -28,8 +28,8 @@ export default function VerifyEmailPage() {
     try {
       await authApi.verifyEmail({ token })
       setStatus('success')
-      setMessage('Email verified successfully! Redirecting to login...')
-      
+      setMessage('Email verified successfully! We are redirecting you to sign in.')
+
       setTimeout(() => {
         router.push('/login')
       }, 3000)
@@ -40,35 +40,58 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="card bg-base-100 shadow-xl">
-      <div className="card-body items-center text-center">
+    <div className="space-y-8 animate-fade-in text-center py-4">
+      <div className="flex flex-col items-center">
         {status === 'loading' && (
-          <>
-            <Loader2 className="h-16 w-16 animate-spin text-primary" />
-            <h2 className="card-title mt-4">Verifying your email...</h2>
-          </>
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse scale-150" />
+              <div className="w-20 h-20 rounded-3xl bg-base-100 flex items-center justify-center relative border border-white/10 shadow-lg">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-display font-bold">Verifying Email</h2>
+              <p className="text-sm text-base-content/60 font-medium">Please wait while we confirm your identity...</p>
+            </div>
+          </div>
         )}
-        
+
         {status === 'success' && (
-          <>
-            <CheckCircle className="h-16 w-16 text-success" />
-            <h2 className="card-title mt-4 text-success">Verification Successful!</h2>
-            <p className="text-base-content/70">{message}</p>
-          </>
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-success/20 blur-xl rounded-full scale-150" />
+              <div className="w-20 h-20 rounded-3xl bg-base-100 flex items-center justify-center relative border border-white/10 shadow-lg">
+                <CheckCircle className="h-10 w-10 text-success" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-display font-bold text-success">Verification Successful!</h2>
+              <p className="text-sm text-base-content/60 font-medium leading-relaxed">{message}</p>
+            </div>
+            <div className="loading loading-dots loading-sm text-success"></div>
+          </div>
         )}
-        
+
         {status === 'error' && (
-          <>
-            <XCircle className="h-16 w-16 text-error" />
-            <h2 className="card-title mt-4 text-error">Verification Failed</h2>
-            <p className="text-base-content/70">{message}</p>
-            <button 
-              className="btn btn-primary mt-4"
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-error/20 blur-xl rounded-full scale-150" />
+              <div className="w-20 h-20 rounded-3xl bg-base-100 flex items-center justify-center relative border border-white/10 shadow-lg">
+                <XCircle className="h-10 w-10 text-error" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-display font-bold text-error">Verification Failed</h2>
+              <p className="text-sm text-base-content/60 font-medium">{message}</p>
+            </div>
+            <button
+              className="btn btn-gradient px-8 shadow-glow hover:shadow-glow-lg transition-all"
               onClick={() => router.push('/login')}
             >
-              Go to Login
+              Back to Login
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>

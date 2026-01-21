@@ -48,7 +48,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-base-200/50">
+    <div className="flex h-screen bg-base-100 overflow-hidden">
       {/* Sidebar - Retractable */}
       <div className="hidden lg:block h-screen sticky top-0 z-30">
         <Sidebar onDocumentSelect={setSelectedDocumentId} />
