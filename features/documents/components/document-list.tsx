@@ -2,9 +2,10 @@
 
 import { useDocuments } from '../hooks/use-documents'
 import { DocumentTable } from './document-table'
-import { Loader2, FileQuestion } from 'lucide-react'
+import { Loader2, FileQuestion, Filter, Search, CheckCircle2, Clock, AlertCircle, LayoutGrid } from 'lucide-react'
 import { DocumentStatus } from '@/lib/api/documents'
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 interface DocumentListProps {
   projectId: string
@@ -14,58 +15,71 @@ export function DocumentList({ projectId }: DocumentListProps) {
   const [status, setStatus] = useState<DocumentStatus | undefined>()
   const { data, isLoading } = useDocuments(projectId, { status })
 
+  const filterItems = [
+    { label: 'All', value: undefined, icon: LayoutGrid },
+    { label: 'Completed', value: DocumentStatus.COMPLETED, icon: CheckCircle2, color: 'text-success' },
+    { label: 'Processing', value: DocumentStatus.PROCESSING, icon: Clock, color: 'text-warning' },
+    { label: 'Failed', value: DocumentStatus.FAILED, icon: AlertCircle, color: 'text-error' },
+  ]
+
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
-
-  if (!data?.items.length) {
-    return (
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body items-center text-center py-12">
-          <FileQuestion className="h-16 w-16 text-base-content/30" />
-          <h3 className="text-xl font-semibold mt-4">No documents yet</h3>
-          <p className="text-base-content/70">
-            Upload your first document to get started
-          </p>
-        </div>
+      <div className="flex flex-col items-center justify-center py-24 gap-4 animate-fade-in">
+        <span className="loading loading-dots loading-lg text-primary"></span>
+        <p className="text-xs font-bold uppercase tracking-widest text-base-content/40">Fetching Knowledge Base...</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
-        <button
-          className={`btn btn-sm ${!status ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setStatus(undefined)}
-        >
-          All ({data.total})
-        </button>
-        <button
-          className={`btn btn-sm ${status === DocumentStatus.COMPLETED ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setStatus(DocumentStatus.COMPLETED)}
-        >
-          Completed
-        </button>
-        <button
-          className={`btn btn-sm ${status === DocumentStatus.PROCESSING ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setStatus(DocumentStatus.PROCESSING)}
-        >
-          Processing
-        </button>
-        <button
-          className={`btn btn-sm ${status === DocumentStatus.FAILED ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setStatus(DocumentStatus.FAILED)}
-        >
-          Failed
-        </button>
+    <div className="space-y-6 animate-fade-in">
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-base-100/30 p-2 rounded-2xl border border-white/5">
+        <div className="flex p-1 bg-base-200/50 rounded-xl gap-1 overflow-x-auto w-full sm:w-auto overflow-hidden">
+          {filterItems.map((item) => (
+            <button
+              key={item.label}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 whitespace-nowrap",
+                status === item.value
+                  ? "bg-base-100 shadow-sm text-primary scale-105"
+                  : "text-base-content/60 hover:text-base-content hover:bg-base-100/50"
+              )}
+              onClick={() => setStatus(item.value)}
+            >
+              <item.icon className={cn("h-3.5 w-3.5", status === item.value ? "text-primary" : item.color)} />
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4 text-[11px] font-bold text-base-content/40 uppercase tracking-widest pr-4">
+          <Filter className="h-3 w-3" />
+          Showing {data?.items.length || 0} of {data?.total || 0} Documents
+        </div>
       </div>
 
-      <DocumentTable documents={data.items} projectId={projectId} />
+      {data?.items.length === 0 ? (
+        <div className="glass-card flex flex-col items-center justify-center py-24 text-center border-dashed border-2">
+          <div className="w-20 h-20 rounded-3xl bg-base-200 flex items-center justify-center mb-6 opacity-50">
+            <FileQuestion className="h-10 w-10 text-base-content/50" />
+          </div>
+          <h3 className="text-xl font-display font-bold">No results found</h3>
+          <p className="text-sm text-base-content/60 mt-2 max-w-xs mx-auto">
+            No documents match the selected filter. Try changing your search or upload new files.
+          </p>
+          {status && (
+            <button
+              className="btn btn-ghost btn-sm mt-6 text-primary"
+              onClick={() => setStatus(undefined)}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      ) : (
+        <DocumentTable documents={data?.items || []} projectId={projectId} />
+      )}
     </div>
   )
 }
