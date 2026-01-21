@@ -55,8 +55,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
       className="glass-card group relative overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-glow cursor-pointer"
       onClick={navigateToProject}
     >
-      {/* Hover Gradient Border Effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      {/* Hover Background Effect */}
+      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
       <div className="p-6 relative z-10">
         <div className="flex items-start justify-between mb-4">
