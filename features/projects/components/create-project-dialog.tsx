@@ -1,12 +1,21 @@
-
 'use client'
 
+import { Dialog } from '@headlessui/react'
+import { useCreateProject } from '../hooks/use-projects'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createProjectSchema, CreateProjectFormData } from '@/lib/validators/project-schemas'
-import { useCreateProject } from '../hooks/use-projects'
-import { Loader2, X } from 'lucide-react'
-import { useEffect } from 'react'
+import { z } from 'zod'
+import { X, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const createProjectSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255),
+  description: z.string().max(2000).optional(),
+  chunk_size: z.number().min(100).max(4000).default(1000),
+  chunk_overlap: z.number().min(0).max(1000).default(200),
+})
+
+type CreateProjectForm = z.infer<typeof createProjectSchema>
 
 interface CreateProjectDialogProps {
   open: boolean
@@ -14,14 +23,14 @@ interface CreateProjectDialogProps {
 }
 
 export function CreateProjectDialog({ open, onClose }: CreateProjectDialogProps) {
-  const { mutate: createProject, isPending } = useCreateProject()
-  
+  const createMutation = useCreateProject()
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
     reset,
-  } = useForm<CreateProjectFormData>({
+    formState: { errors },
+  } = useForm<CreateProjectForm>({
     resolver: zodResolver(createProjectSchema),
     defaultValues: {
       chunk_size: 1000,
@@ -29,17 +38,11 @@ export function CreateProjectDialog({ open, onClose }: CreateProjectDialogProps)
     },
   })
 
-  useEffect(() => {
-    if (!open) {
-      reset()
-    }
-  }, [open, reset])
-
-  const onSubmit = (data: CreateProjectFormData) => {
-    createProject(data, {
+  const onSubmit = (data: CreateProjectForm) => {
+    createMutation.mutate(data, {
       onSuccess: () => {
-        onClose()
         reset()
+        onClose()
       },
     })
   }
@@ -47,124 +50,94 @@ export function CreateProjectDialog({ open, onClose }: CreateProjectDialogProps)
   if (!open) return null
 
   return (
-    <div className="modal modal-open">
-      <div className="modal-box max-w-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-bold text-2xl">Create New Project</h3>
-          <button 
-            className="btn btn-sm btn-circle btn-ghost"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-base-300/60 backdrop-blur-sm animate-fade-in"
+        onClick={onClose}
+      />
+
+      {/* Dialog */}
+      <div className="relative w-full max-w-lg glass-card rounded-2xl shadow-2xl animate-scale-in">
+        <div className="flex items-center justify-between p-6 border-b border-base-300/30">
+          <h2 className="text-xl font-display font-bold">Create New Project</h2>
+          <button
             onClick={onClose}
-            disabled={isPending}
+            className="btn btn-ghost btn-sm btn-circle hover:bg-base-200/50"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-semibold">Project Name *</span>
-            </label>
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Project Name</label>
             <input
               type="text"
-              placeholder="My Document Project"
-              className={`input input-bordered ${errors.name ? 'input-error' : ''}`}
               {...register('name')}
-              disabled={isPending}
+              className={cn(
+                "input input-bordered w-full bg-base-100/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all",
+                errors.name && "input-error"
+              )}
+              placeholder="e.g. Q4 Financial Reports"
             />
             {errors.name && (
-              <label className="label">
-                <span className="label-text-alt text-error">{errors.name.message}</span>
-              </label>
+              <span className="text-xs text-error">{errors.name.message}</span>
             )}
           </div>
 
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-semibold">Description</span>
-            </label>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Description</label>
             <textarea
-              placeholder="Describe your project..."
-              className={`textarea textarea-bordered h-24 ${errors.description ? 'textarea-error' : ''}`}
               {...register('description')}
-              disabled={isPending}
+              className="textarea textarea-bordered w-full h-24 bg-base-100/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+              placeholder="Optional description..."
             />
             {errors.description && (
-              <label className="label">
-                <span className="label-text-alt text-error">{errors.description.message}</span>
-              </label>
+              <span className="text-xs text-error">{errors.description.message}</span>
             )}
           </div>
 
-          <div className="divider">Advanced Settings</div>
-
           <div className="grid grid-cols-2 gap-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Chunk Size</span>
-              </label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Chunk Size</label>
               <input
                 type="number"
-                className={`input input-bordered ${errors.chunk_size ? 'input-error' : ''}`}
                 {...register('chunk_size', { valueAsNumber: true })}
-                disabled={isPending}
+                className="input input-bordered w-full bg-base-100/50"
               />
-              <label className="label">
-                <span className="label-text-alt">Characters per chunk (100-4000)</span>
-              </label>
-              {errors.chunk_size && (
-                <label className="label">
-                  <span className="label-text-alt text-error">{errors.chunk_size.message}</span>
-                </label>
-              )}
+              <p className="text-[10px] text-base-content/50">
+                Characters per chunk (100-4000)
+              </p>
             </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Chunk Overlap</span>
-              </label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Chunk Overlap</label>
               <input
                 type="number"
-                className={`input input-bordered ${errors.chunk_overlap ? 'input-error' : ''}`}
                 {...register('chunk_overlap', { valueAsNumber: true })}
-                disabled={isPending}
+                className="input input-bordered w-full bg-base-100/50"
               />
-              <label className="label">
-                <span className="label-text-alt">Overlapping characters (0-1000)</span>
-              </label>
-              {errors.chunk_overlap && (
-                <label className="label">
-                  <span className="label-text-alt text-error">{errors.chunk_overlap.message}</span>
-                </label>
-              )}
+              <p className="text-[10px] text-base-content/50">
+                Overlap characters (0-1000)
+              </p>
             </div>
           </div>
 
-          <div className="alert alert-info">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div className="text-sm">
-              <p className="font-semibold">What are chunks?</p>
-              <p>Documents are split into chunks for better search results. Smaller chunks provide more precise results, while larger chunks give more context.</p>
-            </div>
-          </div>
-
-          <div className="modal-action">
+          <div className="pt-4 flex justify-end gap-3">
             <button
               type="button"
-              className="btn btn-ghost"
               onClick={onClose}
-              disabled={isPending}
+              className="btn btn-ghost"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="btn btn-primary"
-              disabled={isPending}
+              disabled={createMutation.isPending}
+              className="btn btn-gradient px-6"
             >
-              {isPending ? (
+              {createMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Creating...

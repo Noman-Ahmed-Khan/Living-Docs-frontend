@@ -9,16 +9,16 @@ export default function ProjectsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Projects</h1>
+          <h1 className="text-3xl font-display font-bold gradient-text">Projects</h1>
           <p className="text-base-content/70 mt-1">
-            Manage your document intelligence projects
+            Manage your document intelligence workspaces
           </p>
         </div>
         <button
-          className="btn btn-primary gap-2"
+          className="btn btn-gradient gap-2 rounded-full px-6 shadow-glow hover:shadow-glow-lg transition-all"
           onClick={() => setIsCreateOpen(true)}
         >
           <Plus className="h-5 w-5" />
