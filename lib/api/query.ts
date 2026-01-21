@@ -24,6 +24,7 @@ export interface QueryRequest {
   include_all_sources?: boolean
   retrieval_strategy?: RetrievalStrategy
   top_k?: number
+  session_id?: string
 }
 
 export interface QueryResponse {
