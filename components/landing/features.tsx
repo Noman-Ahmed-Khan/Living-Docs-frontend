@@ -1,83 +1,77 @@
+'use client'
+
 import {
-  Upload,
+  FileText,
   MessageSquare,
-  FileSearch,
-  Lock,
+  Search,
+  Shield,
   Zap,
-  Target,
+  BarChart
 } from 'lucide-react'
 
 const features = [
   {
-    icon: Upload,
-    title: 'Multi-Format Support',
-    description:
-      'Upload PDF, DOCX, PPTX, XLSX, Markdown, and more. We handle all your document types.',
-    color: 'text-blue-500',
+    name: 'Smart Document Analysis',
+    description: 'Automatically extract and understand key information from PDFs, Word docs, and more.',
+    icon: FileText,
   },
   {
+    name: 'Contextual Chat',
+    description: 'Ask questions and get answers based strictly on your document content.',
     icon: MessageSquare,
-    title: 'AI Chat Interface',
-    description:
-      'Ask questions in natural language and get instant, accurate answers from your documents.',
-    color: 'text-purple-500',
   },
   {
-    icon: FileSearch,
-    title: 'Smart Citations',
-    description:
-      'Every answer includes precise citations with page numbers and character positions.',
-    color: 'text-green-500',
+    name: 'Semantic Search',
+    description: 'Find exactly what you stand for, not just keyword matches, using vector similarity.',
+    icon: Search,
   },
   {
-    icon: Target,
-    title: 'RAG Technology',
-    description:
-      'Advanced Retrieval-Augmented Generation ensures accurate, contextual responses.',
-    color: 'text-orange-500',
+    name: 'Enterprise Security',
+    description: 'Bank-grade encryption for your documents and data at rest and in transit.',
+    icon: Shield,
   },
   {
+    name: 'Real-time Processing',
+    description: 'Upload documents and start chatting instantly with our optimized pipeline.',
     icon: Zap,
-    title: 'Lightning Fast',
-    description:
-      'Get answers in seconds with our optimized vector search and LLM processing.',
-    color: 'text-yellow-500',
   },
   {
-    icon: Lock,
-    title: 'Secure & Private',
-    description:
-      'Your documents are encrypted and stored securely. Only you have access to your data.',
-    color: 'text-red-500',
+    name: 'Insightful Analytics',
+    description: 'Track usage, query patterns, and document engagement metrics.',
+    icon: BarChart,
   },
 ]
 
 export function Features() {
   return (
-    <section id="features" className="py-20 bg-base-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Everything You Need
+    <section className="py-24 relative overflow-hidden bg-base-100">
+      {/* Background decoration */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-4xl font-display font-bold mb-4">
+            Everything you need to <span className="gradient-text">master your docs</span>
           </h2>
-          <p className="text-xl text-base-content/70 max-w-2xl mx-auto">
-            Powerful features to help you get the most out of your documents
+          <p className="text-xl text-base-content/70 font-light">
+            Powerful features designed to help you extract value from your knowledge base instantly.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature) => (
+          {features.map((feature, i) => (
             <div
-              key={feature.title}
-              className="card bg-base-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              key={feature.name}
+              className="glass-card p-8 rounded-2xl hover:bg-base-100/80 transition-all duration-300 group hover:shadow-glow"
+              style={{ animationDelay: `${i * 100}ms` }}
             >
-              <div className="card-body">
-                <div className={`w-12 h-12 rounded-lg bg-base-300 flex items-center justify-center mb-4`}>
-                  <feature.icon className={`h-6 w-6 ${feature.color}`} />
-                </div>
-                <h3 className="card-title text-xl mb-2">{feature.title}</h3>
-                <p className="text-base-content/70">{feature.description}</p>
+              <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <feature.icon className="h-7 w-7 text-white" />
               </div>
+              <h3 className="text-xl font-bold mb-3 font-display">{feature.name}</h3>
+              <p className="text-base-content/70 leading-relaxed">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>
